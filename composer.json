@@ -1,0 +1,74 @@
+{
+    "name": "justinholtweb/craft-stethoscope",
+    "description": "Laravel Pulse cards for Craft — element queries, slow templates, cache hit rates and queue depth, per section.",
+    "type": "craft-plugin",
+    "version": "6.0.0-beta.1",
+    "keywords": [
+        "craft",
+        "cms",
+        "craftcms",
+        "craft-plugin",
+        "stethoscope",
+        "laravel"
+    ],
+    "license": "proprietary",
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "authors": [
+        {
+            "name": "Justin Holt",
+            "homepage": "https://justinholt.com"
+        }
+    ],
+    "require": {
+        "php": "^8.5",
+        "craftcms/cms": "^6.0.0-beta.1"
+    },
+    "require-dev": {
+        "larastan/larastan": "^3.13",
+        "laravel/pint": "^1.22",
+        "orchestra/testbench": "^11.0",
+        "pestphp/pest": "^5.0",
+        "pestphp/pest-plugin-laravel": "^5.0",
+        "phpstan/phpstan": "^2.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "JustinHoltWeb\\Stethoscope\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "JustinHoltWeb\\Stethoscope\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "pest",
+        "phpstan": "phpstan analyse --memory-limit=1G",
+        "check-cs": "pint --test",
+        "fix-cs": "pint"
+    },
+    "config": {
+        "allow-plugins": {
+            "craftcms/plugin-installer": true,
+            "pestphp/pest-plugin": true
+        },
+        "platform": {
+            "php": "8.5"
+        },
+        "sort-packages": true
+    },
+    "support": {
+        "issues": "https://github.com/justinholtweb/craft-stethoscope/issues",
+        "source": "https://github.com/justinholtweb/craft-stethoscope"
+    },
+    "extra": {
+        "name": "Stethoscope",
+        "handle": "stethoscope",
+        "developer": "Justin Holt",
+        "developerUrl": "https://justinholt.com",
+        "documentationUrl": "https://github.com/justinholtweb/craft-stethoscope",
+        "changelogUrl": "https://raw.githubusercontent.com/justinholtweb/craft-stethoscope/main/CHANGELOG.md",
+        "class": "JustinHoltWeb\\Stethoscope\\Plugin"
+    }
+}
