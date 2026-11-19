@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace JustinHoltWeb\Stethoscope\Gql;
 
 use CraftCms\Cms\Gql\GqlHelper;
+use CraftCms\Cms\Support\Facades\Sites;
 use CraftCms\Cms\View\CacheCollectors\DependencyCollector;
 use GraphQL\Error\UserError;
 use Illuminate\Support\Facades\Log;
@@ -27,6 +28,9 @@ class SummaryResolver
     }
 
     /**
+     * Limited to the sites the schema can read: per-site rows outside them are dropped, and
+     * site-less totals are null unless the schema reads every site.
+     *
      * @param  array<string, mixed>  $args
      * @return array<string, mixed>
      */
@@ -43,15 +47,11 @@ class SummaryResolver
         }
 
         $site = null;
+        $allowed = array_map(fn ($s): string => $s->handle, GqlHelper::getAllowedSites());
 
         if (isset($args['site'])) {
             $handle = (string) $args['site'];
-
-            foreach (GqlHelper::getAllowedSites() as $allowed) {
-                if ($allowed->handle === $handle) {
-                    $site = $allowed->handle;
-                }
-            }
+            $site = in_array($handle, $allowed, true) ? $handle : null;
 
             // Unknown and not-allowed read the same, so a schema can't probe for site handles.
             if ($site === null) {
@@ -63,7 +63,12 @@ class SummaryResolver
         app(DependencyCollector::class)->setExpiryDate(now()->addSeconds(5));
 
         try {
-            return app(Summary::class)->for($period, $site);
+            // No site asked for: all sites only when the schema can read every one; otherwise
+            // just the readable ones, and nothing that isn't recorded per site.
+            $every = array_map(fn ($s): string => $s->handle, Sites::getAllSites(true)->all());
+            $sites = $site === null && array_diff($every, $allowed) !== [] ? $allowed : null;
+
+            return app(Summary::class)->for($period, $site, $sites);
         } catch (Throwable $e) {
             Log::warning('Stethoscope summary failed: '.$e->getMessage());
 

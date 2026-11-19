@@ -94,7 +94,8 @@ class Stethoscope
         try {
             $request = request();
 
-            return $request->isCpRequest() || str_contains($request->path(), 'livewire');
+            // Livewire's endpoints are `livewire-<hash>/update` etc.
+            return $request->isCpRequest() || str_starts_with($request->path(), 'livewire');
         } catch (Throwable) {
             return true;
         }

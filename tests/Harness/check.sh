@@ -142,7 +142,11 @@ ok "gql: queries recorded by schema and operation name" "$(n stethoscope_graphql
 ok "gql: never the query text" "$(sql "select count(*) from pulse_entries e where e.id > $M and e.key like '%stethoscopeLog%' and e.type like 'stethoscope_graphql%'")" "0"
 settings "['enableGraphql' => true]"
 tk 'CraftCms\Cms\Support\Facades\Gql::invalidateCaches(); echo 1;' >/dev/null
-ok "gql: summary for a schema with the component" "$(gq full '{ stethoscopeSummary(period: "1_hour") { period sampleRate totals { elementSaves pageRenders queueJobs } } }' 'j(s["period"], s["sampleRate"], s["totals"]["elementSaves"] > 0, s["totals"]["pageRenders"] > 0, s["totals"]["queueJobs"] >= 2)')" "1_hour/1/True/True/True"
+ok "gql: summary for a schema with the component" "$(gq full '{ stethoscopeSummary(period: "1_hour") { period sampleRate totals { elementSaves pageRenders } } }' 'j(s["period"], s["sampleRate"], s["totals"]["elementSaves"] > 0, s["totals"]["pageRenders"] > 0)')" "1_hour/1/True/True"
+ok "PHP API: all-sites summary includes site-less totals" "$(tk "echo json_encode(app(JustinHoltWeb\\Stethoscope\\Summary::class)->for('1_hour')['totals']['queueJobs'] >= 2);")" "true"
+# A schema that can't read every site sees only its sites' rows, and no site-less totals.
+ok "gql: one-site schema, no site argument: only that site's rows" "$(gq onesite '{ stethoscopeSummary { elementSaves { site } } }' 'j(len(s["elementSaves"]) > 0, sorted(set(r["site"] for r in s["elementSaves"])))')" "True/['default']"
+ok "gql: one-site schema: site-less totals are null" "$(gq onesite '{ stethoscopeSummary { totals { queueJobs failedJobs transforms elementSaves } } }' 'j(s["totals"]["queueJobs"], s["totals"]["failedJobs"], s["totals"]["transforms"], s["totals"]["elementSaves"] is not None)')" "None/None/None/True"
 ok "gql: element saves per section and site" "$(gq full '{ stethoscopeSummary { elementSaves { elementType group site drafts count } } }' 'any(r["group"] == "stethoscopeLog" and r["site"] == "default" and not r["drafts"] and r["count"] >= 1 for r in s["elementSaves"])')" "True"
 ok "gql: no template paths or names in the summary" "$(gq full '{ stethoscopeSummary { totals { pageRenders } elementSaves { group } } }' '"st/page" in str(r)')" "False"
 ok "gql: schema without the component has no summary query" "$(gq none '{ stethoscopeSummary { period } }' '0')" 'ERR:Cannot query field "stethoscopeSummary" on type "Query".'
@@ -204,6 +208,9 @@ if [ "$MULTI" = yes ]; then
   ok "multisite card: … and no default-site rows" "$(echo "$FR" | has default)" "no"
   ok "multisite card: the site selector lists the French site" "$(curl -sk -b "$ADMIN" "$U/admin/stethoscope" | grep -c 'Stethoscope Français')" "1"
   settings "['enableGraphql' => true]"; tk 'CraftCms\Cms\Support\Facades\Gql::invalidateCaches(); echo 1;' >/dev/null
+  ok "multisite gql: one-site schema never sees the French site's saves" "$(gq onesite '{ stethoscopeSummary { elementSaves { site } } }' '"stethoscopefr" in [r["site"] for r in s["elementSaves"]]')" "False"
+  ok "multisite gql: one-site schema can't ask for the French site" "$(gq onesite '{ stethoscopeSummary(site: "stethoscopefr") { site } }' '0')" "ERR:This schema can’t read the “stethoscopefr” site."
+  ok "multisite gql: two-site schema sees both sites' saves" "$(gq full '{ stethoscopeSummary { elementSaves { site } } }' 'j("default" in [r["site"] for r in s["elementSaves"]], "stethoscopefr" in [r["site"] for r in s["elementSaves"]])')" "True/True"
   ok "multisite gql: site filter returns only that site's saves" "$(gq full '{ stethoscopeSummary(site: "stethoscopefr") { elementSaves { site } } }' 'j(len(s["elementSaves"]) > 0, all(r["site"] == "stethoscopefr" for r in s["elementSaves"]))')" "True/True"
   settings "['enableGraphql' => false]"
   entry '$e->title = "Heartbeat 2";' stethoscopefr >/dev/null

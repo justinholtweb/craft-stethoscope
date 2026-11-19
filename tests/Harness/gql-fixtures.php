@@ -3,6 +3,7 @@
 // Stethoscope harness: GraphQL schemas + tokens (idempotent). Token = "stethoscope{name}" padded to 32.
 //   full  the primary site (+ stethoscopefr when it exists), the stethoscopeLog section, the summary component
 //   none  the same, without the summary component
+//   onesite  the primary site only, the section, the summary component (site-scoping checks)
 // Run with: ddev artisan tinker --execute "require 'storage/stethoscope-gql-fixtures.php';"
 
 use CraftCms\Cms\Gql\Data\GqlSchema;
@@ -17,7 +18,7 @@ if ($fr = Sites::getSiteByHandle('stethoscopefr', true)) {
 }
 $section = 'sections.'.Sections::getSectionByHandle('stethoscopeLog')->uid.':read';
 
-foreach (['full' => [...$sites, $section, 'stethoscope.summary:read'], 'none' => [...$sites, $section]] as $name => $scope) {
+foreach (['full' => [...$sites, $section, 'stethoscope.summary:read'], 'none' => [...$sites, $section], 'onesite' => [$sites[0], $section, 'stethoscope.summary:read']] as $name => $scope) {
     $schema = collect(Gql::getSchemas())->first(fn ($s) => $s->name === "stethoscope_{$name}") ?? new GqlSchema;
     $schema->name = "stethoscope_{$name}";
     $schema->scope = $scope;

@@ -29,7 +29,10 @@ User-authenticated GraphQL requests get it only with the dashboard permission.
 ```
 
 - `period`: `1_hour` (default), `6_hours`, `24_hours` or `7_days`. Anything else is an error.
-- `site`: a site handle the schema can read; omit for all sites. An unknown site and a site the schema
+- `site`: a site handle the schema can read. Omit it for every site the schema can read: a schema
+  limited to some sites only ever sees those sites' rows and totals, and — because queue jobs,
+  failed jobs and transforms aren't recorded per site — gets `null` for those unless it can read
+  every site. An unknown site and a site the schema
   can't read give the same error, so a schema can't discover site handles.
 - Totals that aren't recorded per site (queue jobs, failed jobs, transforms) are `null` when you ask
   for a site.

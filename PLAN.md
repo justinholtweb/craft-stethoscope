@@ -29,7 +29,7 @@ pages are slow, how many element queries a template fires, whether `{% cache %}`
 | Privacy | ✅ Pulse filter scrubs emails/IPs from every key (Pulse's too) and query strings from URLs; user cards without email/Gravatar; search terms off |
 | Icon, docs, promos, site | icon ✅, README/docs/CHANGELOG ✅; promos and justinholt.com page — see below |
 
-Checks: Pest 59 (unit), `tests/Harness/check.sh` (live, see file header). Pint, Larastan 6, port-check green.
+Checks: Pest 53 (unit), `tests/Harness/check.sh` 86 live checks (access, every recorder with Twig/Blade parity, GraphQL incl. site scoping, privacy, Livewire cards, multisite, uninstall/reinstall). Pint, Larastan 6, port-check green.
 
 ## Design notes
 - Pulse's tables belong to Pulse: install runs Pulse's own migration only when they're missing; uninstall purges

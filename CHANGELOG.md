@@ -11,7 +11,7 @@
 - “View the Stethoscope dashboard” permission. Pulse's `viewPulse` gate maps to it in every environment, so Pulse's own `/pulse` page is never open to guests, even with `APP_ENV=local`.
 - Privacy defaults: email/IP addresses scrubbed from every Pulse key, query strings dropped from recorded URLs, user cards without emails or Gravatar, search terms off.
 - Sample rate (1 in N requests/jobs); cards scale counts back up and mark them “~”.
-- `stethoscopeSummary` GraphQL query, off by default, behind its own schema component.
+- `stethoscopeSummary` GraphQL query, off by default, behind its own schema component, and limited to the sites the schema can read.
 - `vendor:publish --tag=stethoscope-dashboard` to customise the dashboard layout.
 - Sidebar link with an optional custom label and icon.
 - Install creates Pulse's tables when they're missing; uninstall removes only Stethoscope's entries.

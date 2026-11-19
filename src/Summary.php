@@ -22,18 +22,24 @@ class Summary
     public function __construct(private readonly Settings $settings) {}
 
     /**
+     * $sites limits an all-sites answer to those handles (a GraphQL schema that can't read
+     * every site); totals that aren't recorded per site are then null, as for a single site.
+     *
+     * @param  list<string>|null  $sites
      * @return array{period: string, site: string|null, sampleRate: int, totals: array<string, int|float|null>, elementSaves: list<array<string, mixed>>}
      */
-    public function for(string $period, ?string $site = null): array
+    public function for(string $period, ?string $site = null, ?array $sites = null): array
     {
         $interval = CarbonInterval::hours(self::PERIODS[$period] ?? 1);
         $rate = $this->settings->rate();
+        $limited = $site !== null || $sites !== null;
+        $inScope = fn (?string $handle): bool => $site !== null ? $handle === $site : ($sites === null || in_array($handle, $sites, true));
 
         $rows = fn (string $type, array $aggregates, ?int $siteIndex): Collection => Pulse::aggregate($type, $aggregates, $interval, $aggregates[0], 'desc', 1000)
             ->map(fn (object $row): object => (object) ['parts' => Key::decode((string) $row->key), 'count' => (float) ($row->count ?? 0), 'avg' => (float) ($row->avg ?? 0), 'max' => (float) ($row->max ?? 0)])
-            ->filter(fn (object $row): bool => $site === null || $siteIndex === null || ($row->parts[$siteIndex] ?? null) === $site)
+            ->filter(fn (object $row): bool => $siteIndex === null || $inScope($row->parts[$siteIndex] ?? null))
             ->values();
-        $total = fn (string $type, ?int $siteIndex): ?int => $site !== null && $siteIndex === null ? null : (int) round($rows($type, ['count'], $siteIndex)->sum('count') * $rate);
+        $total = fn (string $type, ?int $siteIndex): ?int => $limited && $siteIndex === null ? null : (int) round($rows($type, ['count'], $siteIndex)->sum('count') * $rate);
 
         $saves = $rows(Stethoscope::ELEMENT_SAVE, ['count', 'avg', 'max'], 2);
         $renders = $rows(Stethoscope::RENDER, ['count', 'avg', 'max'], 1)->filter(fn (object $r): bool => ($r->parts[2] ?? null) === 'page');
