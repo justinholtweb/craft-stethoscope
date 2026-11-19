@@ -5,3 +5,10 @@ parameters:
     level: 6
     paths:
         - src
+        - routes
+        - database
+    ignoreErrors:
+        # Plugin views live under the `stethoscope::` namespace, registered at runtime.
+        -
+            message: '#expects view-string, string given#'
+            identifier: argument.type
