@@ -60,6 +60,7 @@
         "sort-packages": true
     },
     "support": {
+        "docs": "https://justinholt.com/plugins/craft-stethoscope/docs",
         "issues": "https://github.com/justinholtweb/craft-stethoscope/issues",
         "source": "https://github.com/justinholtweb/craft-stethoscope"
     },
@@ -68,7 +69,7 @@
         "handle": "stethoscope",
         "developer": "Justin Holt",
         "developerUrl": "https://justinholt.com",
-        "documentationUrl": "https://github.com/justinholtweb/craft-stethoscope",
+        "documentationUrl": "https://justinholt.com/plugins/craft-stethoscope/docs",
         "changelogUrl": "https://raw.githubusercontent.com/justinholtweb/craft-stethoscope/main/CHANGELOG.md",
         "class": "JustinHoltWeb\\Stethoscope\\Plugin"
     }
