@@ -1,0 +1,10 @@
+{# Stethoscope harness page (Twig): 1 listing query + 1 query per entry (a deliberate N+1), a named
+   cache block, a {% stethoscope %} timing and an optional search (?q=). #}
+{% set r = app('request') %}
+{% set entries = craft.entries.section('stethoscopeLog').orderBy('id asc').limit(5).all() %}
+{% stethoscope 'st-loop' %}
+<ol>{% for e in entries %}{% set again = craft.entries.id(e.id).one() %}<li data-id="{{ again.id }}">{{ again.title }}</li>{% endfor %}</ol>
+{% endstethoscope %}
+{% cache using key 'st-nav-' ~ 42 %}<nav>cached</nav>{% endcache %}
+{% if r.query('q') %}<p id="found">{{ craft.entries.section('stethoscopeLog').search(r.query('q')).all()|length }}</p>{% endif %}
+{% if r.query('qs') %}<p id="scored">{{ craft.entries.section('stethoscopeLog').search(r.query('qs')).orderBy('score desc').all()|length }}</p>{% endif %}
