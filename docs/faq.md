@@ -49,3 +49,20 @@ pages, and `@stethoscope` mirrors `{% stethoscope %}`.
 
 The GraphQL card records your API's queries. A `stethoscopeSummary` query exists but is off by
 default — see [GraphQL](graphql).
+
+## Stethoscope or Control Tower?
+
+[Control Tower](https://craft-controltower.com) is an operations dashboard for Craft 5: live
+traffic, who's editing, content health, the queue, server metrics and alert rules that post to Slack,
+Teams or email.
+
+Stethoscope is about **performance**, on Craft 6. Its cards sit in Laravel Pulse and show element
+saves, element queries per page template, slow templates, template cache hit rates, jobs, GraphQL
+and search. Both show queue activity. Stethoscope has no alert rules; Pulse is a dashboard you look
+at, not a pager.
+
+## And Microscope?
+
+[Microscope](https://craft-microscope.com) runs an **audit**: it checks your schema, templates, PHP,
+database and server once and tells you what to fix. Stethoscope **watches** real traffic all the
+time. Use Microscope to find the problems, and Stethoscope to see whether the fixes held.
