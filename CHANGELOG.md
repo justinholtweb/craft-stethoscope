@@ -1,6 +1,11 @@
 # Release Notes for Stethoscope
 
-## 6.0.0-beta.1 - Unreleased
+## 6.0.0-beta.2 - 2026-11-21
+
+### Changed
+- The docs FAQ now compares Stethoscope with Control Tower and Microscope.
+
+## 6.0.0-beta.1 - 2026-11-19
 
 > {warning} Craft 6 is in beta, and so is Stethoscope. Use caution on production sites.
 

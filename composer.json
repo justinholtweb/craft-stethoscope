@@ -2,7 +2,7 @@
     "name": "justinholtweb/craft-stethoscope",
     "description": "Laravel Pulse cards for Craft — element queries, slow templates, cache hit rates and queue depth, per section.",
     "type": "craft-plugin",
-    "version": "6.0.0-beta.1",
+    "version": "6.0.0-beta.2",
     "keywords": [
         "craft",
         "cms",
